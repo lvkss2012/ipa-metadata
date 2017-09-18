@@ -1,3 +1,15 @@
+#this is forked from ipa-metadata,git url:https://github.com/matiassingers/ipa-metadata
+When I use ipa-metadata,I got err "openssl x509",but it give me what I want in data,like the follwing code show:
+
+ipaMetadata('Facebook.ipa', function(error, data){
+  console.log(data);
+}
+
+I test this on Windows 10.
+I want to ignore the verification of ipa.So I fork the respository and add code to ignore this this,and change it to promise style.
+Thanks to Matias Singers for the ipa-metadata source code
+
+
 # ipa-metadata [![Build Status](http://img.shields.io/travis/matiassingers/ipa-metadata.svg?style=flat-square)](https://travis-ci.org/matiassingers/ipa-metadata) [![Dependency Status](http://img.shields.io/gemnasium/matiassingers/ipa-metadata.svg?style=flat-square)](https://gemnasium.com/matiassingers/ipa-metadata) [![Coverage Status](http://img.shields.io/coveralls/matiassingers/ipa-metadata.svg?style=flat-square)](https://coveralls.io/r/matiassingers/ipa-metadata)
 > extract metadata and provisioning information about an .ipa file
 
