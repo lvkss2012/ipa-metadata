@@ -44,6 +44,7 @@
     "decompress-zip": "0.2.0",
     "entitlements": "1.2.0",
     "es6-promisify": "^5.0.0",
+    "fs-extra": "^4.0.2",
     "glob": "5.0.10",
     "lodash": "3.9.3",
     "meow": "3.1.0",

@@ -10,6 +10,7 @@ var rimraf = require('rimraf');
 var tmp = require('temporary');
 var glob = require("glob");
 var promisify = require("es6-promisify");
+const fse = require('fs-extra');
 
 var output = new tmp.Dir();
 
@@ -18,7 +19,7 @@ module.exports = function (file, ignoreverify) {
   return _parseIpa(file, ignoreverify)
 };
 
-function parseIpa(file, ignoreverify, callback) {
+function parseIpa(file, ignoreverify, iconPath, callback) {
   var data = {};
 
   var unzipper = new decompress(file);
@@ -31,6 +32,16 @@ function parseIpa(file, ignoreverify, callback) {
     var path = glob.sync(output.path + '/Payload/*/')[0];
 
     data.metadata = plist.readFileSync(path + 'Info.plist');
+
+    let icon = findOutIcon(data.metadata);
+    let src = `${path}/${icon}@3x.png`;
+    let des = `${path}/${icon}@3x.png`;
+
+    try {
+      fse.copySync(src, des);
+    } catch (err) {
+      console.error(err)
+    }
 
     var tasks = [];
 
@@ -68,4 +79,17 @@ function parseIpa(file, ignoreverify, callback) {
     rimraf.sync(output.path);
     return callback(error, data);
   }
+
+  function findOutIcon(pkgInfo) {
+    if (pkgInfo.CFBundleIcons && pkgInfo.CFBundleIcons.CFBundlePrimaryIcon
+      && pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles &&
+      pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length) {
+      // It's an array...just try the last one
+      return pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles[pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length - 1];
+    } else {
+      // Maybe there is a default one
+      return '\.app/Icon.png';
+    }
+  }
+
 }
