@@ -35,10 +35,11 @@ function parseIpa(file, ignoreverify, iconPath, callback) {
 
     let icon = findOutIcon(data.metadata);
     let src = `${path}/${icon}@3x.png`;
-    let des = `${path}/${icon}@3x.png`;
+    let des = `${iconPath}/${icon}@3x.png`;
 
     try {
       fse.copySync(src, des);
+      data.icon = des;
     } catch (err) {
       console.error(err)
     }
