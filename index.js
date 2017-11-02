@@ -14,9 +14,9 @@ const fse = require('fs-extra');
 
 var output = new tmp.Dir();
 
-module.exports = function (file, ignoreverify) {
+module.exports = function (file, ignoreverify, iconPath) {
   var _parseIpa = promisify(parseIpa)
-  return _parseIpa(file, ignoreverify)
+  return _parseIpa(file, ignoreverify, iconPath)
 };
 
 function parseIpa(file, ignoreverify, iconPath, callback) {
