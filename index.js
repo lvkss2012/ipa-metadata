@@ -34,7 +34,7 @@ function parseIpa(file, ignoreverify, iconPath, callback) {
     data.metadata = plist.readFileSync(path + 'Info.plist');
 
     let icon = findOutIcon(data.metadata);
-    let src = `${path}/${icon}@3x.png`;
+    let src = `${path}${icon}@3x.png`;
     let des = `${iconPath}/${icon}@3x.png`;
 
     try {
