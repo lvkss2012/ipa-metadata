@@ -33,12 +33,11 @@ function parseIpa(file, ignoreverify, iconPath, callback) {
 
     data.metadata = plist.readFileSync(path + 'Info.plist');
 
-    let icon = findOutIcon(data.metadata);
-    let src = `${path}${icon}@3x.png`;
+    let icon = findOutIcon(data.metadata, path);
     let des = `${iconPath}.png`;
 
     try {
-      fse.copySync(src, des);
+      fse.copySync(icon, des);
       data.icon = des;
     } catch (err) {
       console.error(err)
@@ -81,16 +80,45 @@ function parseIpa(file, ignoreverify, iconPath, callback) {
     return callback(error, data);
   }
 
-  function findOutIcon(pkgInfo) {
-    if (pkgInfo.CFBundleIcons && pkgInfo.CFBundleIcons.CFBundlePrimaryIcon
-      && pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles &&
-      pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length) {
-      // It's an array...just try the last one
-      return pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles[pkgInfo.CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length - 1];
+  function findOutIcon(pkgInfo, path) {
+    let isIphone = true;
+    let bundleIcons = pkgInfo['CFBundleIcons'];
+    if (!bundleIcons) {
+      isIphone = false
+      bundleIcons = pkgInfo['CFBundleIcons~ipad'];
+    }
+
+    if (bundleIcons && bundleIcons.CFBundlePrimaryIcon
+      && bundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles &&
+      bundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length) {
+
+      let iconName = bundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles[bundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles.length - 1];
+      return extendFileName(iconName, isIphone, path)
+
     } else {
       // Maybe there is a default one
       return '\.app/Icon.png';
     }
   }
+
+  function extendFileName(oriName, isIphone, path) {
+    let names = [];
+    if (isIphone) {
+      names = [`${path}${oriName}@3x.png`, `${path}${oriName}@2x.png`, `${path}${oriName}.png`]
+    }
+    else {
+      names = [`${path}${oriName}@3x~ipad.png`, `${path}${oriName}@2x~ipad.png`, `${path}${oriName}~ipad.png`]
+    }
+
+    let iconName = '';
+    for (let i = 0; i < names.length; i++) {
+      if (fse.existsSync(names[i])) {
+        iconName = names[i];
+        break;
+      }
+    }
+    return iconName;
+  }
+
 
 }
